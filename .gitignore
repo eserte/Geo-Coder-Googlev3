@@ -1,3 +1,5 @@
+/.prove
+/Geo-Coder-Googlev3-*.tar.gz
 /Makefile
 /Makefile.old
 /blib
