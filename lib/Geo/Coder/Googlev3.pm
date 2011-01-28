@@ -12,7 +12,7 @@ package Geo::Coder::Googlev3;
 
 use strict;
 use vars qw($VERSION);
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp            ('croak');
 use Encode          ();
@@ -85,7 +85,7 @@ Geo::Coder::Googlev3 - Google Maps v3 Geocoding API
 =head1 DESCRIPTION
 
 Use this module just like L<Geo::Coder::Google>. Note that no
-C<apikey> is used in Google's v3 API, and the returned result object
+C<apikey> is used in Google's v3 API, and the returned data structure
 differs.
 
 Please check also
@@ -93,9 +93,139 @@ L<http://code.google.com/intl/en/apis/maps/documentation/geocoding/>
 for more information about Google's Geocoding API and especially usage
 limits.
 
+=head2 CONSTRUCTOR
+
+=over
+
+=item new
+
+    $geocoder = Geo::Coder::Googlev3->new;
+    $geocoder = Geo::Coder::Googlev3->new(language => 'de', gl => 'es');
+
+Creates a new geocoding object.
+
+The L<Geo::Coder::Google>'s C<oe> and C<apikey> parameters are not
+supported.
+
+=back
+
+=head2 METHODS
+
+=over
+
+=item geocode
+
+    $location = $geocoder->geocode(location => $location);
+
+Queries I<$location> to Google Maps geocoding API and returns a hash
+reference.
+
+The returned data structure looks like this:
+
+  {
+    "formatted_address" => "Brandenburger Tor, Pariser Platz 7, 10117 Berlin, Germany",
+    "types" => [
+      "point_of_interest",
+      "establishment"
+    ],
+    "address_components" => [
+      {
+        "types" => [
+          "point_of_interest",
+          "establishment"
+        ],
+        "short_name" => "Brandenburger Tor",
+        "long_name" => "Brandenburger Tor"
+      },
+      {
+        "types" => [
+          "street_number"
+        ],
+        "short_name" => 7,
+        "long_name" => 7
+      },
+      {
+        "types" => [
+          "route"
+        ],
+        "short_name" => "Pariser Platz",
+        "long_name" => "Pariser Platz"
+      },
+      {
+        "types" => [
+          "sublocality",
+          "political"
+        ],
+        "short_name" => "Mitte",
+        "long_name" => "Mitte"
+      },
+      {
+        "types" => [
+          "locality",
+          "political"
+        ],
+        "short_name" => "Berlin",
+        "long_name" => "Berlin"
+      },
+      {
+        "types" => [
+          "administrative_area_level_2",
+          "political"
+        ],
+        "short_name" => "Berlin",
+        "long_name" => "Berlin"
+      },
+      {
+        "types" => [
+          "administrative_area_level_1",
+          "political"
+        ],
+        "short_name" => "Berlin",
+        "long_name" => "Berlin"
+      },
+      {
+        "types" => [
+          "country",
+          "political"
+        ],
+        "short_name" => "DE",
+        "long_name" => "Germany"
+      },
+      {
+        "types" => [
+          "postal_code"
+        ],
+        "short_name" => 10117,
+        "long_name" => 10117
+      }
+    ],
+    "geometry" => {
+      "viewport" => {
+        "southwest" => {
+          "lat" => "52.5094785",
+          "lng" => "13.3617711"
+        },
+        "northeast" => {
+          "lat" => "52.5230586",
+          "lng" => "13.3937859"
+        }
+      },
+      "location" => {
+        "lat" => "52.5162691",
+        "lng" => "13.3777785"
+      },
+      "location_type" => "APPROXIMATE"
+    }
+  };
+
+=back  
+
 =head1 AUTHOR
 
 Slaven Rezic <srezic@cpan.org>
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
