@@ -5,7 +5,7 @@ use Test::More;
 
 sub within ($$$$$$);
 
-plan tests => 23;
+plan tests => 25;
 
 use_ok 'Geo::Coder::Googlev3';
 
@@ -54,6 +54,15 @@ isa_ok $geocoder, 'Geo::Coder::Googlev3';
 	}
     }
     is $postal_code_component->{long_name}, $postal_code;
+}
+
+{ # region
+    my $geocoder_es = Geo::Coder::Googlev3->new(gl => 'es', language => 'de');
+    my $location_es = $geocoder_es->geocode(location => 'Toledo');
+    is $location_es->{geometry}->{location}->{lng}, '-4.0244759';
+    my $geocoder_us = Geo::Coder::Googlev3->new();
+    my $location_us = $geocoder_us->geocode(location => 'Toledo');
+    is $location_us->{geometry}->{location}->{lng}, '-83.555212';
 }
 
 sub within ($$$$$$) {
