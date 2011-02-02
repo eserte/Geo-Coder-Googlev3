@@ -37,8 +37,9 @@ isa_ok $geocoder, 'Geo::Coder::Googlev3';
 
 { # encoding checks - more utf8
     my $street = "Trg bana Josipa Jela\x{10d}i\x{107}a";
+    my $alternative = "Ban Jela\x{10d}i\x{107} Square"; # outcome as of 2011-02-02
     my $location = $geocoder->geocode(location => "$street, Zagreb, Croatia");
-    like $location->{formatted_address}, qr{$street}i;
+    like $location->{formatted_address}, qr{($street|$alternative)}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
     within $lat, $lng, 45.8, 45.9, 15.9, 16.0;
 }
