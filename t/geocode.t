@@ -38,8 +38,9 @@ isa_ok $geocoder, 'Geo::Coder::Googlev3';
 { # encoding checks - more utf8
     my $street = "Trg bana Josipa Jela\x{10d}i\x{107}a";
     my $alternative = "Ban Jela\x{10d}i\x{107} Square"; # outcome as of 2011-02-02
+    my $alternative2 = 'City of Zagreb, Croatia'; # happened once in February 2011, see http://www.cpantesters.org/cpan/report/447c31b8-6cb5-1014-b648-c13506c0976e
     my $location = $geocoder->geocode(location => "$street, Zagreb, Croatia");
-    like $location->{formatted_address}, qr{($street|$alternative)}i;
+    like $location->{formatted_address}, qr{($street|$alternative|$alternative2)}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
     within $lat, $lng, 45.8, 45.9, 15.9, 16.0;
 }
