@@ -12,7 +12,7 @@ package Geo::Coder::Googlev3;
 
 use strict;
 use vars qw($VERSION);
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Carp            ('croak');
 use Encode          ();

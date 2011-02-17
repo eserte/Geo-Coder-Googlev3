@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.04
+	- just another test fix
+
 0.03
 	- fixed test to accommodate changed results from Google
 
