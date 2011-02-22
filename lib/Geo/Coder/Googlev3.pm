@@ -12,7 +12,7 @@ package Geo::Coder::Googlev3;
 
 use strict;
 use vars qw($VERSION);
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp            ('croak');
 use Encode          ();
@@ -58,7 +58,11 @@ sub geocode {
 	my $content = $resp->decoded_content(charset => "none");
 	my $res = JSON::XS->new->utf8->decode($content);
 	if ($res->{status} eq 'OK') {
-	    return $res->{results}->[0];
+            if (wantarray) {
+                return @{ $res->{results} };
+            } else {
+                return $res->{results}->[0];
+            }
 	} else {
 	    croak "Fetching $url did not return OK status";
 	}
@@ -80,7 +84,8 @@ Geo::Coder::Googlev3 - Google Maps v3 Geocoding API
     use Geo::Coder::Googlev3;
 
     my $geocoder = Geo::Coder::Googlev3->new;
-    my $location = $geocoder->geocode(location => 'Brandenburger Tor, Berlin');
+    my $location  = $geocoder->geocode(location => 'Brandenburger Tor, Berlin');
+    my @locations = $geocoder->geocode(location => 'Berliner Straße, Berlin, Germany');
 
 =head1 DESCRIPTION
 
@@ -116,9 +121,11 @@ supported.
 =item geocode
 
     $location = $geocoder->geocode(location => $location);
+    @locations = $geocoder->geocode(location => $location);
 
-Queries I<$location> to Google Maps geocoding API and returns a hash
-reference.
+Queries I<$location> to Google Maps geocoding API. In scalar context
+it returns a hash reference of the first (best matching?) location. In
+list context it returns a list of such hash references.
 
 The returned data structure looks like this:
 

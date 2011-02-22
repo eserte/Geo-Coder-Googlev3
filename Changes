@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.05
+	- geocode method now returns multiple results in list context
+
 0.04
 	- just another test fix
 

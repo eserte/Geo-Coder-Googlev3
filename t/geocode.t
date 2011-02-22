@@ -5,12 +5,18 @@ use Test::More;
 
 sub within ($$$$$$);
 
-plan tests => 25;
+plan tests => 27;
 
 use_ok 'Geo::Coder::Googlev3';
 
 my $geocoder = Geo::Coder::Googlev3->new;
 isa_ok $geocoder, 'Geo::Coder::Googlev3';
+
+{ # list context
+    my @locations = $geocoder->geocode(location => 'Berliner Straße, Berlin, Germany');
+    cmp_ok scalar(@locations), ">", 1, "More than one result found"; # There are eight hits in Berlin, Google knows seven of them
+    like $locations[0]->{formatted_address}, qr{Berliner Straße}, 'First result looks OK';
+}
 
 {
     my $location = $geocoder->geocode(location => 'Brandenburger Tor, Berlin, Germany');
