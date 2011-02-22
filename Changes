@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.06
+	- more diagnostics if an API call failed (status!=OK)
+
 0.05
 	- geocode method now returns multiple results in list context
 

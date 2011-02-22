@@ -12,7 +12,7 @@ package Geo::Coder::Googlev3;
 
 use strict;
 use vars qw($VERSION);
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp            ('croak');
 use Encode          ();
@@ -64,7 +64,7 @@ sub geocode {
                 return $res->{results}->[0];
             }
 	} else {
-	    croak "Fetching $url did not return OK status";
+	    croak "Fetching $url did not return OK status, but '" . $res->{status} . "'";
 	}
     } else {
 	croak "Fetching $url failed: " . $resp->status_line;
