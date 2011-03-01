@@ -248,7 +248,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Geo::Coder::Google>.
+L<Geo::Coder::Google>, L<Geo::Coder::Many>.
 
 =cut
 
