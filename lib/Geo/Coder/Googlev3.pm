@@ -63,6 +63,8 @@ sub geocode {
             } else {
                 return $res->{results}->[0];
             }
+        } elsif ($res->{status} eq 'ZERO_RESULTS') {
+            return;
 	} else {
 	    croak "Fetching $url did not return OK status, but '" . $res->{status} . "'";
 	}

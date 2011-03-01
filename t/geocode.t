@@ -5,7 +5,7 @@ use Test::More;
 
 sub within ($$$$$$);
 
-plan tests => 27;
+plan tests => 29;
 
 use_ok 'Geo::Coder::Googlev3';
 
@@ -71,6 +71,14 @@ isa_ok $geocoder, 'Geo::Coder::Googlev3';
     my $geocoder_us = Geo::Coder::Googlev3->new();
     my $location_us = $geocoder_us->geocode(location => 'Toledo');
     is $location_us->{geometry}->{location}->{lng}, '-83.555212';
+}
+
+{ # zero results
+    my @locations = $geocoder->geocode(location => 'This query should not find anything but return ZERO_RESULTS, Foobartown');
+    cmp_ok scalar(@locations), "==", 0, "No result found";
+
+    my $location = $geocoder->geocode(location => 'This query should not find anything but return ZERO_RESULTS, Foobartown');
+    is $location, undef, "No result found";
 }
 
 sub within ($$$$$$) {
