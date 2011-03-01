@@ -1,5 +1,10 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.07
+	- ZERO_RESULTS is not anymore an error, but is returned as an
+	  empty result
+	- raw option
+
 0.06
 	- more diagnostics if an API call failed (status!=OK)
 
