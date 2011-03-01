@@ -5,7 +5,7 @@ use Test::More;
 
 sub within ($$$$$$);
 
-plan tests => 29;
+plan tests => 30;
 
 use_ok 'Geo::Coder::Googlev3';
 
@@ -79,6 +79,17 @@ isa_ok $geocoder, 'Geo::Coder::Googlev3';
 
     my $location = $geocoder->geocode(location => 'This query should not find anything but return ZERO_RESULTS, Foobartown');
     is $location, undef, "No result found";
+}
+
+{ # raw
+    my $raw_result = $geocoder->geocode(location => 'Brandenburger Tor, Berlin, Germany', raw => 1);
+    # This is the 11th query here, so it's very likely that the API
+    # limits are hit.
+    like $raw_result->{status}, qr{^(OK|OVER_QUERY_LIMIT)$}, 'raw query';
+    if ($raw_result->{status} eq 'OVER_QUERY_LIMIT') {
+	diag 'over query limit hit, sleep a little bit';
+	sleep 1; # in case a smoker tries this module with another perl...
+    }
 }
 
 sub within ($$$$$$) {
