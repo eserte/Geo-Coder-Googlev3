@@ -42,6 +42,7 @@ sub ua {
 sub geocode {
     my($self, %args) = @_;
     my $loc = $args{location};
+    my $raw = $args{raw};
     my $ua = $self->ua;
     my $url = URI->new('http://maps.google.com/maps/api/geocode/json');
     my %url_params;
@@ -57,6 +58,9 @@ sub geocode {
     if ($resp->is_success) {
 	my $content = $resp->decoded_content(charset => "none");
 	my $res = JSON::XS->new->utf8->decode($content);
+        if ($raw) {
+            return $res;
+        }
 	if ($res->{status} eq 'OK') {
             if (wantarray) {
                 return @{ $res->{results} };
@@ -226,6 +230,12 @@ The returned data structure looks like this:
       "location_type" => "APPROXIMATE"
     }
   };
+
+The B<raw> option may be set to a true value to get the uninterpreted,
+raw result from the API. Just the JSON data will be translated into a
+perl hash.
+
+    $raw_result = $geocoder->geocode(location => $location, raw => 1);
 
 =back  
 
