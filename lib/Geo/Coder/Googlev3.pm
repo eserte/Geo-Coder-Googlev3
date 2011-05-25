@@ -28,6 +28,7 @@ sub new {
         LWP::UserAgent->new(
                             agent     => __PACKAGE__ . "/$VERSION libwww-perl/$LWP::VERSION",
                             env_proxy => 1,
+                            timeout   => 15,
                            );
     $self->{region}   = delete $args{region} || delete $args{gl};
     $self->{language} = delete $args{language};
@@ -121,7 +122,7 @@ Creates a new geocoding object.
 
 The C<ua> parameter may be supplied to override the default
 L<LWP::UserAgent> object. The default C<LWP::UserAgent> object sets
-the C<env_proxy> option.
+the C<timeout> to 15 seconds and enables the C<env_proxy> option.
 
 The L<Geo::Coder::Google>'s C<oe> and C<apikey> parameters are not
 supported.
