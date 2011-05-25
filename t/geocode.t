@@ -13,9 +13,15 @@ my $geocoder = Geo::Coder::Googlev3->new;
 isa_ok $geocoder, 'Geo::Coder::Googlev3';
 
 { # list context
-    my @locations = $geocoder->geocode(location => 'Berliner Straße, Berlin, Germany');
-    cmp_ok scalar(@locations), ">", 1, "More than one result found"; # There are eight hits in Berlin, Google knows seven of them
-    like $locations[0]->{formatted_address}, qr{Berliner Straße}, 'First result looks OK';
+    ## There are eight hits in Berlin. Google uses to know seven of them.
+    ## But beginning from approx. 2010-05, only one location is returned.
+    #my @locations = $geocoder->geocode(location => 'Berliner Straße, Berlin, Germany');
+    #cmp_ok scalar(@locations), ">=", 1, "One or more results found";
+    #like $locations[0]->{formatted_address}, qr{Berliner Straße}, 'First result looks OK';
+
+    my @locations = $geocoder->geocode(location => 'Waterloo, UK');
+    cmp_ok scalar(@locations), ">", 1, "More than one result found";
+    like $locations[0]->{formatted_address}, qr{Waterloo}, 'First result looks OK';
 }
 
 {
