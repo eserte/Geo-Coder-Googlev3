@@ -5,12 +5,15 @@ use Test::More;
 
 sub within ($$$$$$);
 
-plan tests => 30;
+my $real_tests = 28;
+plan tests => 2 + $real_tests;;
 
 use_ok 'Geo::Coder::Googlev3';
 
 my $geocoder = Geo::Coder::Googlev3->new;
 isa_ok $geocoder, 'Geo::Coder::Googlev3';
+
+SKIP: {
 
 { # list context
     ## There are eight hits in Berlin. Google uses to know seven of them.
@@ -19,7 +22,11 @@ isa_ok $geocoder, 'Geo::Coder::Googlev3';
     #cmp_ok scalar(@locations), ">=", 1, "One or more results found";
     #like $locations[0]->{formatted_address}, qr{Berliner Straße}, 'First result looks OK';
 
-    my @locations = $geocoder->geocode(location => 'Waterloo, UK');
+    my @locations = eval { $geocoder->geocode(location => 'Waterloo, UK') };
+    if ($@ =~ m{Fetching.*failed: 500}) {
+	diag $@;
+	skip "Fetch failed, probably network connection problems", $real_tests;
+    }
     cmp_ok scalar(@locations), ">", 1, "More than one result found";
     like $locations[0]->{formatted_address}, qr{Waterloo}, 'First result looks OK';
 }
@@ -96,6 +103,8 @@ isa_ok $geocoder, 'Geo::Coder::Googlev3';
 	diag 'over query limit hit, sleep a little bit';
 	sleep 1; # in case a smoker tries this module with another perl...
     }
+}
+
 }
 
 sub within ($$$$$$) {
