@@ -12,7 +12,7 @@ package Geo::Coder::Googlev3;
 
 use strict;
 use vars qw($VERSION);
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Carp            ('croak');
 use Encode          ();
@@ -24,7 +24,11 @@ use URI::QueryParam ();
 sub new {
     my($class, %args) = @_;
     my $self = bless {}, $class;
-    $self->{ua}       = delete $args{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION libwww-perl/$LWP::VERSION");
+    $self->{ua}       = delete $args{ua} ||
+        LWP::UserAgent->new(
+                            agent     => __PACKAGE__ . "/$VERSION libwww-perl/$LWP::VERSION",
+                            env_proxy => 1,
+                           );
     $self->{region}   = delete $args{region} || delete $args{gl};
     $self->{language} = delete $args{language};
     croak "Unsupported arguments: " . join(" ", %args) if %args;
@@ -114,6 +118,10 @@ limits.
     $geocoder = Geo::Coder::Googlev3->new(language => 'de', gl => 'es');
 
 Creates a new geocoding object.
+
+The C<ua> parameter may be supplied to override the default
+L<LWP::UserAgent> object. The default C<LWP::UserAgent> object sets
+the C<env_proxy> option.
 
 The L<Geo::Coder::Google>'s C<oe> and C<apikey> parameters are not
 supported.
