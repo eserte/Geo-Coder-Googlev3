@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.10
+	- accessors for region and language (provided by abh)
+
 0.09
 	- default LWP::UserAgent object sets env_proxy
 	  [rt.cpan.org #66480] and sets timeout to 15s
