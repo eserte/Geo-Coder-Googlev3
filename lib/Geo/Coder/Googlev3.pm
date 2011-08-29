@@ -82,6 +82,19 @@ sub geocode {
     }
 }
 
+sub region {
+    my $self = shift;
+    $self->{region} = shift if @_;
+    return $self->{region};
+}
+
+
+sub language {
+    my $self = shift;
+    $self->{language} = shift if @_;
+    return $self->{language};
+}
+
 1;
 
 __END__
@@ -126,6 +139,8 @@ the C<timeout> to 15 seconds and enables the C<env_proxy> option.
 
 The L<Geo::Coder::Google>'s C<oe> and C<apikey> parameters are not
 supported.
+
+The parameters C<region> and C<language> are also accepted.
 
 =back
 
@@ -245,6 +260,17 @@ raw result from the API. Just the JSON data will be translated into a
 perl hash.
 
     $raw_result = $geocoder->geocode(location => $location, raw => 1);
+
+=item region
+
+Accessor for the C<region> parameter. The value should be a country
+code ("es", "dk", "us", etc). Use this to tell the webservice to
+prefer matches from that region. See the Google documentation for more
+information.
+
+=item language
+
+Accessor for the C<language> parameter.
 
 =back  
 
