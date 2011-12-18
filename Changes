@@ -1,5 +1,9 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.10_50
+	- various test fixes for changed Google output, and
+	  protect from floating point inaccuracy
+
 0.10
 	- accessors for region and language (provided by abh)
 
