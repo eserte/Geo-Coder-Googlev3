@@ -1,12 +1,17 @@
 # -*- coding:iso-8859-1; -*-
 
 use strict;
+use FindBin;
+use lib "$FindBin::RealBin";
+
 use Test::More;
+
+use TestUtil;
 
 sub within ($$$$$$);
 
-my $real_tests = 28;
-plan tests => 2 + $real_tests;;
+my $real_tests = 33;
+plan tests => 2 + $real_tests;
 
 use_ok 'Geo::Coder::Googlev3';
 
@@ -27,12 +32,23 @@ SKIP: {
 	diag $@;
 	skip "Fetch failed, probably network connection problems", $real_tests;
     }
-    cmp_ok scalar(@locations), ">", 1, "More than one result found";
+    # Since approx. 2011-12 there's only one result, previously it was more
+    cmp_ok scalar(@locations), ">=", 1, "One or more results found";
     like $locations[0]->{formatted_address}, qr{Waterloo}, 'First result looks OK';
 }
 
 {
     my $location = $geocoder->geocode(location => 'Brandenburger Tor, Berlin, Germany');
+    # Since approx. 2011-12 "brandenburg gate" instead of "brandenburger tor" is returned
+    like $location->{formatted_address}, qr{(brandenburger tor.*berlin|brandenburg gate)}i;
+    my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
+    within $lat, $lng, 52.5, 52.6, 13.3, 13.4;
+}
+
+{
+    # ... but if language=>"de" is forced, then the German name is returned
+    my $geocoder_de = Geo::Coder::Googlev3->new(language => 'de');
+    my $location = $geocoder_de->geocode(location => 'Brandenburger Tor, Berlin, Germany');
     like $location->{formatted_address}, qr{brandenburger tor.*berlin}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
     within $lat, $lng, 52.5, 52.6, 13.3, 13.4;
@@ -80,10 +96,10 @@ SKIP: {
 { # region
     my $geocoder_es = Geo::Coder::Googlev3->new(gl => 'es', language => 'de');
     my $location_es = $geocoder_es->geocode(location => 'Toledo');
-    is $location_es->{geometry}->{location}->{lng}, '-4.0244759';
+    is_float $location_es->{geometry}->{location}->{lng}, -4.0244759;
     my $geocoder_us = Geo::Coder::Googlev3->new();
     my $location_us = $geocoder_us->geocode(location => 'Toledo');
-    is $location_us->{geometry}->{location}->{lng}, '-83.555212';
+    is_float $location_us->{geometry}->{location}->{lng}, -83.555212;
 }
 
 { # zero results
