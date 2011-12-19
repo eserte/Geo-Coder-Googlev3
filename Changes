@@ -1,5 +1,9 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.10_51
+	- again just test fixes, protecting against
+	  OVER_QUERY_LIMIT in tests
+
 0.10_50
 	- various test fixes for changed Google output, and
 	  protect from floating point inaccuracy
