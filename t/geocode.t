@@ -4,14 +4,10 @@ use strict;
 use FindBin;
 use lib "$FindBin::RealBin";
 
-use Test::More;
-
-use TestUtil;
+use Test::More 'no_plan';
 
 sub within ($$$$$$);
-
-my $real_tests = 33;
-plan tests => 2 + $real_tests;
+sub safe_geocode (&);
 
 use_ok 'Geo::Coder::Googlev3';
 
@@ -30,7 +26,8 @@ SKIP: {
     my @locations = eval { $geocoder->geocode(location => 'Waterloo, UK') };
     if ($@ =~ m{Fetching.*failed: 500}) {
 	diag $@;
-	skip "Fetch failed, probably network connection problems", $real_tests;
+	diag "Fetch failed, probably network connection problems, skipping remaining tests";
+	last SKIP;
     }
     # Since approx. 2011-12 there's only one result, previously it was more
     cmp_ok scalar(@locations), ">=", 1, "One or more results found";
@@ -38,7 +35,7 @@ SKIP: {
 }
 
 {
-    my $location = $geocoder->geocode(location => 'Brandenburger Tor, Berlin, Germany');
+    my $location = safe_geocode { $geocoder->geocode(location => 'Brandenburger Tor, Berlin, Germany') };
     # Since approx. 2011-12 "brandenburg gate" instead of "brandenburger tor" is returned
     like $location->{formatted_address}, qr{(brandenburger tor.*berlin|brandenburg gate)}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
@@ -48,14 +45,14 @@ SKIP: {
 {
     # ... but if language=>"de" is forced, then the German name is returned
     my $geocoder_de = Geo::Coder::Googlev3->new(language => 'de');
-    my $location = $geocoder_de->geocode(location => 'Brandenburger Tor, Berlin, Germany');
+    my $location = safe_geocode { $geocoder_de->geocode(location => 'Brandenburger Tor, Berlin, Germany') };
     like $location->{formatted_address}, qr{brandenburger tor.*berlin}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
     within $lat, $lng, 52.5, 52.6, 13.3, 13.4;
 }
 
 { # encoding checks - bytes
-    my $location = $geocoder->geocode(location => 'Öschelbronner Weg, Berlin, Germany');
+    my $location = safe_geocode { $geocoder->geocode(location => 'Öschelbronner Weg, Berlin, Germany') };
     like $location->{formatted_address}, qr{schelbronner weg.*berlin}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
     within $lat, $lng, 52.6, 52.7, 13.3, 13.4;
@@ -64,7 +61,7 @@ SKIP: {
 { # encoding checks - utf8
     my $street = 'Öschelbronner Weg';
     utf8::upgrade($street);
-    my $location = $geocoder->geocode(location => "$street, Berlin, Germany");
+    my $location = safe_geocode { $geocoder->geocode(location => "$street, Berlin, Germany") };
     like $location->{formatted_address}, qr{schelbronner weg.*berlin}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
     within $lat, $lng, 52.6, 52.7, 13.3, 13.4;
@@ -74,7 +71,7 @@ SKIP: {
     my $street = "Trg bana Josipa Jela\x{10d}i\x{107}a";
     my $alternative = "Ban Jela\x{10d}i\x{107} Square"; # outcome as of 2011-02-02
     my $alternative2 = 'City of Zagreb, Croatia'; # happened once in February 2011, see http://www.cpantesters.org/cpan/report/447c31b8-6cb5-1014-b648-c13506c0976e
-    my $location = $geocoder->geocode(location => "$street, Zagreb, Croatia");
+    my $location = safe_geocode { $geocoder->geocode(location => "$street, Zagreb, Croatia") };
     like $location->{formatted_address}, qr{($street|$alternative|$alternative2)}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
     within $lat, $lng, 45.8, 45.9, 15.9, 16.0;
@@ -82,7 +79,7 @@ SKIP: {
 
 {
     my $postal_code = 'E1A 7G1';
-    my $location = $geocoder->geocode(location => "$postal_code, Canada");
+    my $location = safe_geocode { $geocoder->geocode(location => "$postal_code, Canada") };
     my $postal_code_component;
     for my $address_component (@{ $location->{address_components} }) {
 	if (grep { $_ eq 'postal_code' } @{ $address_component->{types} }) {
@@ -95,18 +92,20 @@ SKIP: {
 
 { # region
     my $geocoder_es = Geo::Coder::Googlev3->new(gl => 'es', language => 'de');
-    my $location_es = $geocoder_es->geocode(location => 'Toledo');
-    is_float $location_es->{geometry}->{location}->{lng}, -4.0244759;
+    my $location_es = safe_geocode { $geocoder_es->geocode(location => 'Toledo') };
+    within $location_es->{geometry}->{location}->{lat}, $location_es->{geometry}->{location}->{lng},
+	39.856777, 39.856778, -4.024476, -4.024475;
     my $geocoder_us = Geo::Coder::Googlev3->new();
-    my $location_us = $geocoder_us->geocode(location => 'Toledo');
-    is_float $location_us->{geometry}->{location}->{lng}, -83.555212;
+    my $location_us = safe_geocode { $geocoder_us->geocode(location => 'Toledo') };
+    within $location_us->{geometry}->{location}->{lat}, $location_us->{geometry}->{location}->{lng},
+	41.663938, 41.663939, -83.55522, -83.55521;
 }
 
 { # zero results
-    my @locations = $geocoder->geocode(location => 'This query should not find anything but return ZERO_RESULTS, Foobartown');
+    my @locations = safe_geocode { $geocoder->geocode(location => 'This query should not find anything but return ZERO_RESULTS, Foobartown') };
     cmp_ok scalar(@locations), "==", 0, "No result found";
 
-    my $location = $geocoder->geocode(location => 'This query should not find anything but return ZERO_RESULTS, Foobartown');
+    my $location = safe_geocode { $geocoder->geocode(location => 'This query should not find anything but return ZERO_RESULTS, Foobartown') };
     is $location, undef, "No result found";
 }
 
@@ -129,6 +128,36 @@ sub within ($$$$$$) {
     cmp_ok $lat, "<=", $lat_max;
     cmp_ok $lng, ">=", $lng_min;
     cmp_ok $lng, "<=", $lng_max;
+}
+
+sub safe_geocode (&) {
+    my($code0) = @_;
+    my @locations;
+    my $code;
+    if (wantarray) {
+	$code = sub { @locations = eval { &$code0 } };
+    } else {
+	$code = sub { $locations[0] = eval { &$code0 } };
+    }
+
+    $code->();
+    if ($@ =~ m{OVER_QUERY_LIMIT}) {
+	diag $@;
+	diag "Hit OVER_QUERY_LIMIT, sleep some seconds before retrying...";
+	sleep 3;
+	$code->();
+	if ($@ =~ m{OVER_QUERY_LIMIT}) {
+	    diag $@;
+	    diag "Hit OVER_QUERY_LIMIT, skipping remaining tests...";
+	    last SKIP;
+	}
+    }
+
+    if (wantarray) {
+	@locations;
+    } else {
+	$locations[0];
+    }
 }
 
 # Local Variables:
