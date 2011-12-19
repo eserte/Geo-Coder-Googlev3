@@ -149,6 +149,7 @@ sub safe_geocode (&) {
 	if ($@ =~ m{OVER_QUERY_LIMIT}) {
 	    diag $@;
 	    diag "Hit OVER_QUERY_LIMIT, skipping remaining tests...";
+	    no warnings 'exiting';
 	    last SKIP;
 	}
     }
