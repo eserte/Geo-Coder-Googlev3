@@ -12,7 +12,7 @@ package Geo::Coder::Googlev3;
 
 use strict;
 use vars qw($VERSION);
-our $VERSION = '0.10_51';
+our $VERSION = '0.10_52';
 
 use Carp            ('croak');
 use Encode          ();
@@ -32,6 +32,9 @@ sub new {
                            );
     $self->{region}   = delete $args{region} || delete $args{gl};
     $self->{language} = delete $args{language};
+    if ($args{bounds}) {
+        $self->bounds(delete $args{bounds});
+    }
     croak "Unsupported arguments: " . join(" ", %args) if %args;
     $self;
 }
@@ -55,6 +58,9 @@ sub geocode {
     $url_params{sensor}   = 'false';
     $url_params{region}   = $self->{region}   if defined $self->{region};
     $url_params{language} = $self->{language} if defined $self->{language};
+    if (defined $self->{bounds}) {
+        $url_params{bounds} = join '|', map { $_->{lat}.','.$_->{lng} } @{ $self->{bounds} };
+    }
     while(my($k,$v) = each %url_params) {
         $url->query_param($k => Encode::encode_utf8($v));
     }
@@ -93,6 +99,26 @@ sub language {
     my $self = shift;
     $self->{language} = shift if @_;
     return $self->{language};
+}
+
+use constant _BOUNDS_ERROR_MSG => "bounds must be in the form [{lat=>...,lng=>...}, {lat=>...,lng=>...}]";
+
+sub bounds {
+    my $self = shift;
+    if (@_) {
+        my $bounds = shift;
+        if (ref $bounds ne 'ARRAY') {
+            croak _BOUNDS_ERROR_MSG . ', but the supplied parameter is not even an array reference.';
+        }
+        if (@$bounds != 2) {
+            croak _BOUNDS_ERROR_MSG . ', but the supplied parameter has not exactly two array elements.';
+        }
+        if ((grep { ref $_ eq 'HASH' && exists $_->{lng} && exists $_->{lat} ? 1 : 0 } @$bounds) != 2) {
+            croak _BOUNDS_ERROR_MSG . ', but the supplied elements are not lat/lng hashes.';
+        }
+        $self->{bounds} = $bounds;
+    }
+    return $self->{bounds};
 }
 
 1;
@@ -140,7 +166,10 @@ the C<timeout> to 15 seconds and enables the C<env_proxy> option.
 The L<Geo::Coder::Google>'s C<oe> and C<apikey> parameters are not
 supported.
 
-The parameters C<region> and C<language> are also accepted.
+The parameters C<region>, C<language>, and C<bounds> are also
+accepted. The C<bounds> parameter should be in the form:
+
+   [{lat => ..., lng => ...}, {lat => ..., lng => ...}]
 
 =back
 
@@ -271,6 +300,10 @@ information.
 =item language
 
 Accessor for the C<language> parameter.
+
+=item bounds
+
+Accessor for the C<bounds> parameter.
 
 =back  
 

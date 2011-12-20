@@ -92,6 +92,8 @@ SKIP: {
 
 { # region
     my $geocoder_es = Geo::Coder::Googlev3->new(gl => 'es', language => 'de');
+    is $geocoder_es->language, 'de', 'language accessor';
+    is $geocoder_es->region, 'es', 'region accessor';
     my $location_es = safe_geocode { $geocoder_es->geocode(location => 'Toledo') };
     within $location_es->{geometry}->{location}->{lat}, $location_es->{geometry}->{location}->{lng},
 	39.856777, 39.856778, -4.024476, -4.024475;
@@ -99,6 +101,31 @@ SKIP: {
     my $location_us = safe_geocode { $geocoder_us->geocode(location => 'Toledo') };
     within $location_us->{geometry}->{location}->{lat}, $location_us->{geometry}->{location}->{lng},
 	41.663938, 41.663939, -83.55522, -83.55521;
+}
+
+{ # bounds
+    my $location_chicago = safe_geocode { $geocoder->geocode(location => 'Winnetka') };
+    within $location_chicago->{geometry}->{location}->{lat}, $location_chicago->{geometry}->{location}->{lng},
+	42.1080830, 42.1080840, -87.735900, -87.735890;
+
+    my $bounds = [{lat=>34.172684,lng=>-118.604794},{lat=>34.236144,lng=>-118.500938}];
+    my $geocoder_la = Geo::Coder::Googlev3->new(bounds => $bounds);
+    is_deeply $geocoder_la->bounds, $bounds, 'bounds accessor';
+    my $location_la = safe_geocode { $geocoder_la->geocode(location => 'Winnetka') };
+    within $location_la->{geometry}->{location}->{lat}, $location_la->{geometry}->{location}->{lng},
+	34.172684, 34.236144, -118.604794, -118.500938;
+}
+
+{ # invalid bounds
+    eval { $geocoder->bounds('scalar') };
+    like $@, qr{array reference}, 'bounds is not an array';
+    eval { $geocoder->bounds([]) };
+    like $@, qr{two array elements}, 'bounds has not enough elements';
+    eval { $geocoder->bounds([1,2]) };
+    like $@, qr{lat/lng hashes}, 'bound elements are not hashes';
+    eval { $geocoder->bounds([{lng=>1},{lat=>2}]) };
+    like $@, qr{lat/lng hashes}, 'bound elements are missing keys';
+    is $geocoder->bounds, undef, 'bounds is still unchanged';
 }
 
 { # zero results
