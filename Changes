@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.11
+	- stable release with all changes in 0.10_50..0.10_52
+
 0.10_52
 	- implemented bounds parameter and accessor
 
