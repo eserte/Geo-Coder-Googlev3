@@ -96,7 +96,7 @@ SKIP: {
     is $geocoder_es->region, 'es', 'region accessor';
     my $location_es = safe_geocode { $geocoder_es->geocode(location => 'Toledo') };
     within $location_es->{geometry}->{location}->{lat}, $location_es->{geometry}->{location}->{lng},
-	39.856777, 39.856778, -4.024476, -4.024475;
+	39.852434, 39.881947, -4.04314, -4.012585;
     my $geocoder_us = Geo::Coder::Googlev3->new();
     my $location_us = safe_geocode { $geocoder_us->geocode(location => 'Toledo') };
     within $location_us->{geometry}->{location}->{lat}, $location_us->{geometry}->{location}->{lng},
