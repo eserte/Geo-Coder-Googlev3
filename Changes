@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.12
+	- fixed test for changed results (Toledo, ES moved)
+
 0.11
 	- stable release with all changes in 0.10_50..0.10_52
 
