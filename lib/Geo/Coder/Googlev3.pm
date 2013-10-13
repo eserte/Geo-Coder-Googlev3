@@ -150,6 +150,8 @@ sub bounds {
 
 __END__
 
+=encoding ISO8859-1
+
 =head1 NAME
 
 Geo::Coder::Googlev3 - Google Maps v3 Geocoding API 
