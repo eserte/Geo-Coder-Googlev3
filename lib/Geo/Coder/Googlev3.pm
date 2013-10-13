@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2010,2011 Slaven Rezic. All rights reserved.
+# Copyright (C) 2010,2011,2013 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -12,7 +12,7 @@ package Geo::Coder::Googlev3;
 
 use strict;
 use vars qw($VERSION);
-our $VERSION = '0.12';
+our $VERSION = '0.12_50';
 
 use Carp            ('croak');
 use Encode          ();
@@ -32,6 +32,18 @@ sub new {
                            );
     $self->{region}   = delete $args{region} || delete $args{gl};
     $self->{language} = delete $args{language};
+    {
+        my $sensor;
+        if ($args{sensor}) {
+            $sensor = delete $args{sensor};
+            if ($sensor !~ m{^(false|true)$}) {
+                croak "sensor argument has to be either 'false' or 'true'";
+            }
+        } else {
+            $sensor = 'false';
+        }
+        $self->{sensor} = $sensor;
+    }
     if ($args{bounds}) {
         $self->bounds(delete $args{bounds});
     }
@@ -55,7 +67,7 @@ sub geocode {
     my $url = URI->new('http://maps.google.com/maps/api/geocode/json');
     my %url_params;
     $url_params{address}  = $loc;
-    $url_params{sensor}   = 'false';
+    $url_params{sensor}   = $self->{sensor};
     $url_params{region}   = $self->{region}   if defined $self->{region};
     $url_params{language} = $self->{language} if defined $self->{language};
     if (defined $self->{bounds}) {
@@ -170,6 +182,11 @@ The parameters C<region>, C<language>, and C<bounds> are also
 accepted. The C<bounds> parameter should be in the form:
 
    [{lat => ..., lng => ...}, {lat => ..., lng => ...}]
+
+The parameter C<sensor> should be set to the string C<true> if the
+geocoding request comes from a device with a location sensor (see
+L<https://developers.google.com/maps/documentation/geocoding/#GeocodingRequests>).
+The default is C<false>.
 
 =back
 

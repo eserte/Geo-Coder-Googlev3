@@ -147,6 +147,21 @@ SKIP: {
     }
 }
 
+{ # sensor
+    {
+	my $geocoder = Geo::Coder::Googlev3->new(sensor => "false");
+	ok $geocoder;
+    }
+    {
+	my $geocoder = Geo::Coder::Googlev3->new(sensor => "true");
+	ok $geocoder;
+    }
+    eval {
+	Geo::Coder::Googlev3->new(sensor => "nonsense");
+    };
+    like $@, qr{sensor argument has to be either 'false' or 'true'}, 'expected error message for unsupported sensor argument';
+}
+
 }
 
 sub within ($$$$$$) {
