@@ -151,11 +151,13 @@ SKIP: {
     {
 	my $geocoder = Geo::Coder::Googlev3->new(sensor => "false");
 	ok $geocoder;
+	is $geocoder->sensor, 'false';
 	my $url = $geocoder->geocode_url(location => 'Hauptstr., Berlin');
 	like $url, qr{sensor=false}, 'sensor=false detected in URL';
 
 	my $geocoder_default = Geo::Coder::Googlev3->new();
 	ok $geocoder_default;
+	is $geocoder_default->sensor, 'false', 'Default is false';
 	my $url_default = $geocoder_default->geocode_url(location => 'Hauptstr., Berlin');
 	like $url_default, qr{sensor=false}, 'sensor=false detected in URL without explicit sensor setting';
     }
@@ -163,6 +165,7 @@ SKIP: {
     {
 	my $geocoder = Geo::Coder::Googlev3->new(sensor => "true");
 	ok $geocoder;
+	is $geocoder->sensor, 'true';
 	my $url = $geocoder->geocode_url(location => 'Hauptstr., Berlin');
 	like $url, qr{sensor=true}, 'sensor=false detected in URL';
     }

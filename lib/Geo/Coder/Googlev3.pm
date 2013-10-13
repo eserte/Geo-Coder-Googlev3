@@ -120,6 +120,12 @@ sub language {
     return $self->{language};
 }
 
+sub sensor {
+    my $self = shift;
+    $self->{sensor} = shift if @_;
+    return $self->{sensor};
+}
+
 use constant _BOUNDS_ERROR_MSG => "bounds must be in the form [{lat=>...,lng=>...}, {lat=>...,lng=>...}]";
 
 sub bounds {
@@ -328,6 +334,10 @@ Accessor for the C<language> parameter.
 =item bounds
 
 Accessor for the C<bounds> parameter.
+
+=item sensor
+
+Accessor for the C<sensor> parameter.
 
 =back  
 
