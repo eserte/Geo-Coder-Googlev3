@@ -61,22 +61,9 @@ sub ua {
 
 sub geocode {
     my($self, %args) = @_;
-    my $loc = $args{location};
-    my $raw = $args{raw};
+    my $raw = delete $args{raw};
+    my $url = $self->geocode_url(%args);
     my $ua = $self->ua;
-    my $url = URI->new('http://maps.google.com/maps/api/geocode/json');
-    my %url_params;
-    $url_params{address}  = $loc;
-    $url_params{sensor}   = $self->{sensor};
-    $url_params{region}   = $self->{region}   if defined $self->{region};
-    $url_params{language} = $self->{language} if defined $self->{language};
-    if (defined $self->{bounds}) {
-        $url_params{bounds} = join '|', map { $_->{lat}.','.$_->{lng} } @{ $self->{bounds} };
-    }
-    while(my($k,$v) = each %url_params) {
-        $url->query_param($k => Encode::encode_utf8($v));
-    }
-    $url = $url->as_string;
     my $resp = $ua->get($url);
     if ($resp->is_success) {
 	my $content = $resp->decoded_content(charset => "none");
@@ -98,6 +85,26 @@ sub geocode {
     } else {
 	croak "Fetching $url failed: " . $resp->status_line;
     }
+}
+
+# private!
+sub geocode_url {
+    my($self, %args) = @_;
+    my $loc = $args{location};
+    my $url = URI->new('http://maps.google.com/maps/api/geocode/json');
+    my %url_params;
+    $url_params{address}  = $loc;
+    $url_params{sensor}   = $self->{sensor};
+    $url_params{region}   = $self->{region}   if defined $self->{region};
+    $url_params{language} = $self->{language} if defined $self->{language};
+    if (defined $self->{bounds}) {
+        $url_params{bounds} = join '|', map { $_->{lat}.','.$_->{lng} } @{ $self->{bounds} };
+    }
+    while(my($k,$v) = each %url_params) {
+        $url->query_param($k => Encode::encode_utf8($v));
+    }
+    $url = $url->as_string;
+    $url;
 }
 
 sub region {
