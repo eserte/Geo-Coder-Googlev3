@@ -1,5 +1,9 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.12_51
+	- all test cases (also the first one) are run using
+	  safe_geocode
+
 0.12_50
 	- sensor is settable [rt.cpan.org #78520]
 	- specified POD encoding [rt.cpan.org #89213]
