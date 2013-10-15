@@ -23,12 +23,7 @@ SKIP: {
     #cmp_ok scalar(@locations), ">=", 1, "One or more results found";
     #like $locations[0]->{formatted_address}, qr{Berliner Straße}, 'First result looks OK';
 
-    my @locations = eval { $geocoder->geocode(location => 'Waterloo, UK') };
-    if ($@ =~ m{Fetching.*failed: 500}) {
-	diag $@;
-	diag "Fetch failed, probably network connection problems, skipping remaining tests";
-	last SKIP;
-    }
+    my @locations = safe_geocode { $geocoder->geocode(location => 'Waterloo, UK') };
     # Since approx. 2011-12 there's only one result, previously it was more
     cmp_ok scalar(@locations), ">=", 1, "One or more results found";
     like $locations[0]->{formatted_address}, qr{Waterloo}, 'First result looks OK';
@@ -208,6 +203,11 @@ sub safe_geocode (&) {
 	    no warnings 'exiting';
 	    last SKIP;
 	}
+    } elsif ($@ =~ m{Fetching.*failed: 500}) {
+	diag $@;
+	diag "Fetch failed, probably network connection problems, skipping remaining tests";
+	no warnings 'exiting';
+	last SKIP;
     }
 
     if (wantarray) {
