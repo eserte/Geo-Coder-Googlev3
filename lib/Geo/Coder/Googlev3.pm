@@ -162,7 +162,7 @@ Geo::Coder::Googlev3 - Google Maps v3 Geocoding API
 
     my $geocoder = Geo::Coder::Googlev3->new;
     my $location  = $geocoder->geocode(location => 'Brandenburger Tor, Berlin');
-    my @locations = $geocoder->geocode(location => 'Berliner Straße, Berlin, Germany');
+    my @locations = $geocoder->geocode(location => 'Berliner Straï¿½e, Berlin, Germany');
 
 =head1 DESCRIPTION
 
@@ -171,7 +171,7 @@ C<apikey> is used in Google's v3 API, and the returned data structure
 differs.
 
 Please check also
-L<http://code.google.com/intl/en/apis/maps/documentation/geocoding/>
+L<https://developers.google.com/maps/documentation/geocoding/>
 for more information about Google's Geocoding API and especially usage
 limits.
 
