@@ -1,9 +1,9 @@
-# -*- perl -*-
+# -*- mode:perl; coding:iso-8859-1 -*-
 
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2010,2011,2013 Slaven Rezic. All rights reserved.
+# Copyright (C) 2010,2011,2013,2014 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -12,7 +12,7 @@ package Geo::Coder::Googlev3;
 
 use strict;
 use vars qw($VERSION);
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Carp            ('croak');
 use Encode          ();
@@ -162,7 +162,7 @@ Geo::Coder::Googlev3 - Google Maps v3 Geocoding API
 
     my $geocoder = Geo::Coder::Googlev3->new;
     my $location  = $geocoder->geocode(location => 'Brandenburger Tor, Berlin');
-    my @locations = $geocoder->geocode(location => 'Berliner Straï¿½e, Berlin, Germany');
+    my @locations = $geocoder->geocode(location => 'Berliner Straße, Berlin, Germany');
 
 =head1 DESCRIPTION
 
