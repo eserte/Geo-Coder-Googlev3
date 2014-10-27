@@ -46,9 +46,10 @@ SKIP: {
     within $lat, $lng, 52.5, 52.6, 13.3, 13.4;
 }
 
+# Since approx. 2014-10 "Oeschelbronner Path" instead of "Öschelbronner Weg" is returned (!)
 { # encoding checks - bytes
     my $location = safe_geocode { $geocoder->geocode(location => 'Öschelbronner Weg, Berlin, Germany') };
-    like $location->{formatted_address}, qr{schelbronner weg.*berlin}i;
+    like $location->{formatted_address}, qr{schelbronner (weg|path).*berlin}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
     within $lat, $lng, 52.6, 52.7, 13.3, 13.4;
 }
@@ -57,7 +58,7 @@ SKIP: {
     my $street = 'Öschelbronner Weg';
     utf8::upgrade($street);
     my $location = safe_geocode { $geocoder->geocode(location => "$street, Berlin, Germany") };
-    like $location->{formatted_address}, qr{schelbronner weg.*berlin}i;
+    like $location->{formatted_address}, qr{schelbronner (weg|path).*berlin}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
     within $lat, $lng, 52.6, 52.7, 13.3, 13.4;
 }
