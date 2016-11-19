@@ -8,6 +8,19 @@ perl:
   - "5.12"
   - "5.10"
   - "5.8"
+matrix:
+  include:
+    # The perl does not matter here, system perl will be used
+    - perl: "5.18"
+      os: osx
+      sudo: true
+    - perl: "5.18"
+      dist: trusty
+
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; brew install cpanminus; fi
+install:
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then cpanm --sudo --quiet --installdeps --notest .; else cpanm --quiet --installdeps --notest .; fi
 
 branches:
  except:
