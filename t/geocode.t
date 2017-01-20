@@ -32,7 +32,8 @@ SKIP: {
 {
     my $location = safe_geocode { $geocoder->geocode(location => 'Brandenburger Tor, Berlin, Germany') };
     # Since approx. 2011-12 "brandenburg gate" instead of "brandenburger tor" is returned
-    like $location->{formatted_address}, qr{(brandenburger tor.*berlin|brandenburg gate)}i;
+    # Since approx. 2017-01 "pariser platz" is returned
+    like $location->{formatted_address}, qr{(brandenburger tor.*berlin|brandenburg gate|pariser platz.*berlin.*germany)}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
     within $lat, $lng, 52.5, 52.6, 13.3, 13.4;
 }
@@ -41,7 +42,8 @@ SKIP: {
     # ... but if language=>"de" is forced, then the German name is returned
     my $geocoder_de = Geo::Coder::Googlev3->new(language => 'de');
     my $location = safe_geocode { $geocoder_de->geocode(location => 'Brandenburger Tor, Berlin, Germany') };
-    like $location->{formatted_address}, qr{brandenburger tor.*berlin}i;
+    # Since approx. 2017-01 "pariser platz" is returned
+    like $location->{formatted_address}, qr{(brandenburger tor.*berlin|pariser platz.*berlin.*deutschland)}i;
     my($lat, $lng) = @{$location->{geometry}->{location}}{qw(lat lng)};
     within $lat, $lng, 52.5, 52.6, 13.3, 13.4;
 }

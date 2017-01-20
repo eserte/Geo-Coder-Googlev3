@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.15
+	- fixed test for changed results (Brandenburger Tor vs Pariser Platz)
+
 0.14
 	- documentation fix [github.com pull request #2]
 	- fixed test for changed results (Oeschelbronner Weg vs. Path)
