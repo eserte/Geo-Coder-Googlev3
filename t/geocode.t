@@ -6,7 +6,7 @@ use lib "$FindBin::RealBin";
 
 use Test::More 'no_plan';
 
-sub within ($$$$$$);
+sub within ($$$$$$;$);
 sub safe_geocode (&);
 
 use_ok 'Geo::Coder::Googlev3';
@@ -104,14 +104,14 @@ SKIP: {
 { # bounds
     my $location_chicago = safe_geocode { $geocoder->geocode(location => 'Winnetka') };
     within $location_chicago->{geometry}->{location}->{lat}, $location_chicago->{geometry}->{location}->{lng},
-	42.1080830, 42.1080840, -87.735900, -87.735890;
+	42.1080830, 42.1080840, -87.735900, -87.735890, 'Winnetka without bounds';
 
     my $bounds = [{lat=>34.172684,lng=>-118.604794},{lat=>34.236144,lng=>-118.500938}];
     my $geocoder_la = Geo::Coder::Googlev3->new(bounds => $bounds);
     is_deeply $geocoder_la->bounds, $bounds, 'bounds accessor';
     my $location_la = safe_geocode { $geocoder_la->geocode(location => 'Winnetka') };
     within $location_la->{geometry}->{location}->{lat}, $location_la->{geometry}->{location}->{lng},
-	34.172684, 34.236144, -118.604794, -118.500938;
+	34.172684, 34.236144, -118.604794, -118.500938, 'Winnetka with bounds';
 }
 
 { # invalid bounds
@@ -176,12 +176,16 @@ SKIP: {
 
 }
 
-sub within ($$$$$$) {
-    my($lat,$lng,$lat_min,$lat_max,$lng_min,$lng_max) = @_;
-    cmp_ok $lat, ">=", $lat_min;
-    cmp_ok $lat, "<=", $lat_max;
-    cmp_ok $lng, ">=", $lng_min;
-    cmp_ok $lng, "<=", $lng_max;
+sub within ($$$$$$;$) {
+    my($lat,$lng,$lat_min,$lat_max,$lng_min,$lng_max,$testname_prefix) = @_;
+    my $testname = sub ($) {
+	(defined $testname_prefix ? "$testname_prefix (" : "") . $_[0] . (defined $testname_prefix ? ")" : "");
+    };
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    cmp_ok $lat, ">=", $lat_min, $testname->("southern latitude");
+    cmp_ok $lat, "<=", $lat_max, $testname->("northern latitude");
+    cmp_ok $lng, ">=", $lng_min, $testname->("western longitude");
+    cmp_ok $lng, "<=", $lng_max, $testname->("eastern longitude");
 }
 
 sub safe_geocode (&) {
