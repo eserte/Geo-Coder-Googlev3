@@ -46,6 +46,7 @@ sub new {
         $self->bounds(delete $args{bounds});
     }
     $self->{key} = delete $args{key};
+    $self->{use_https} = delete $args{use_https};
     croak "Unsupported arguments: " . join(" ", %args) if %args;
     $self;
 }
@@ -90,7 +91,7 @@ sub geocode {
 sub geocode_url {
     my($self, %args) = @_;
     my $loc = $args{location};
-    my $url = URI->new('http://maps.google.com/maps/api/geocode/json');
+    my $url = URI->new(($self->{use_https} ? 'https' : 'http') . '://maps.google.com/maps/api/geocode/json');
     my %url_params;
     $url_params{address}  = $loc;
     $url_params{sensor}   = $self->{sensor}   if defined $self->{sensor};
@@ -201,6 +202,9 @@ The parameter C<sensor> should be set to the string C<true> if the
 geocoding request comes from a device with a location sensor (see
 L<https://developers.google.com/maps/documentation/geocoding/#GeocodingRequests>).
 There's no default.
+
+By default queries are done using C<http>. By setting the C<use_https>
+parameter to a true value C<https> is used.
 
 =back
 

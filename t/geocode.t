@@ -181,7 +181,24 @@ SKIP: {
     like $@, qr{sensor argument has to be either 'false' or 'true'}, 'expected error message for unsupported sensor argument';
 }
 
+{ # https
+    my $geocoder = Geo::Coder::Googlev3->new(use_https => 1);
+
+    # Probably should not use nested SKIP blocks here
+    if ($geocoder->ua->is_protocol_supported('https')) {
+	my $location = safe_geocode {
+	    $geocoder->geocode(location => 'Berlin')
+	};
+	like $location->{formatted_address}, qr{berlin}i, 'https query';
+    } else {
+	# but here is OK
+    SKIP: {
+	    skip "UA does not support https (maybe you have to install LWP::Protocol::https or so", 1;
+	}
+    }
 }
+
+} # SKIP
 
 sub within ($$$$$$;$) {
     my($lat,$lng,$lat_min,$lat_max,$lng_min,$lng_max,$testname_prefix) = @_;
