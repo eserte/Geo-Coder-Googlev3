@@ -155,9 +155,9 @@ SKIP: {
 
 	my $geocoder_default = Geo::Coder::Googlev3->new();
 	ok $geocoder_default;
-	is $geocoder_default->sensor, 'false', 'Default is false';
+	is $geocoder_default->sensor, undef, "There's no default";
 	my $url_default = $geocoder_default->geocode_url(location => 'Hauptstr., Berlin');
-	like $url_default, qr{sensor=false}, 'sensor=false detected in URL without explicit sensor setting';
+	unlike $url_default, qr{sensor=false}, 'no sensor=false required anymore in URL without explicit sensor setting';
     }
 
     {

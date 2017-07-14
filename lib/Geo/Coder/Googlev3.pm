@@ -39,8 +39,6 @@ sub new {
             if ($sensor !~ m{^(false|true)$}) {
                 croak "sensor argument has to be either 'false' or 'true'";
             }
-        } else {
-            $sensor = 'false';
         }
         $self->{sensor} = $sensor;
     }
@@ -94,7 +92,7 @@ sub geocode_url {
     my $url = URI->new('http://maps.google.com/maps/api/geocode/json');
     my %url_params;
     $url_params{address}  = $loc;
-    $url_params{sensor}   = $self->{sensor};
+    $url_params{sensor}   = $self->{sensor}   if defined $self->{sensor};
     $url_params{region}   = $self->{region}   if defined $self->{region};
     $url_params{language} = $self->{language} if defined $self->{language};
     if (defined $self->{bounds}) {
@@ -201,7 +199,7 @@ accepted. The C<bounds> parameter should be in the form:
 The parameter C<sensor> should be set to the string C<true> if the
 geocoding request comes from a device with a location sensor (see
 L<https://developers.google.com/maps/documentation/geocoding/#GeocodingRequests>).
-The default is C<false>.
+There's no default.
 
 =back
 
