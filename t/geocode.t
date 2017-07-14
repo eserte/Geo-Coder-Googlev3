@@ -7,7 +7,7 @@ use lib "$FindBin::RealBin";
 use Test::More 'no_plan';
 
 sub within ($$$$$$;$);
-sub safe_geocode (&);
+sub safe_geocode (&;$);
 
 use_ok 'Geo::Coder::Googlev3';
 
@@ -15,6 +15,13 @@ my $geocoder = Geo::Coder::Googlev3->new;
 isa_ok $geocoder, 'Geo::Coder::Googlev3';
 
 SKIP: {
+
+{ # key
+    my $geocoder = Geo::Coder::Googlev3->new(key => "INVALID_KEY");
+    my %info;
+    safe_geocode { $geocoder->geocode(location => 'Berlin') } \%info;
+    like $info{err}, qr{REQUEST_DENIED}, 'invalid api key';
+}
 
 { # list context
     ## There are eight hits in Berlin. Google uses to know seven of them.
@@ -188,8 +195,8 @@ sub within ($$$$$$;$) {
     cmp_ok $lng, "<=", $lng_max, $testname->("eastern longitude");
 }
 
-sub safe_geocode (&) {
-    my($code0) = @_;
+sub safe_geocode (&;$) {
+    my($code0, $inforef) = @_;
     my @locations;
     my $code;
     if (wantarray) {
@@ -215,6 +222,10 @@ sub safe_geocode (&) {
 	diag "Fetch failed, probably network connection problems, skipping remaining tests";
 	no warnings 'exiting';
 	last SKIP;
+    }
+
+    if ($inforef) {
+	$inforef->{err} = $@;
     }
 
     if (wantarray) {

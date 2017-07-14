@@ -45,6 +45,7 @@ sub new {
     if ($args{bounds}) {
         $self->bounds(delete $args{bounds});
     }
+    $self->{key} = delete $args{key};
     croak "Unsupported arguments: " . join(" ", %args) if %args;
     $self;
 }
@@ -98,6 +99,7 @@ sub geocode_url {
     if (defined $self->{bounds}) {
         $url_params{bounds} = join '|', map { $_->{lat}.','.$_->{lng} } @{ $self->{bounds} };
     }
+    $url_params{key}      = $self->{key}      if defined $self->{key};
     while(my($k,$v) = each %url_params) {
         $url->query_param($k => Encode::encode_utf8($v));
     }
@@ -188,10 +190,9 @@ The C<ua> parameter may be supplied to override the default
 L<LWP::UserAgent> object. The default C<LWP::UserAgent> object sets
 the C<timeout> to 15 seconds and enables the C<env_proxy> option.
 
-The L<Geo::Coder::Google>'s C<oe> and C<apikey> parameters are not
-supported.
+The L<Geo::Coder::Google>'s C<oe> parameter is not supported.
 
-The parameters C<region>, C<language>, and C<bounds> are also
+The parameters C<region>, C<language>, C<bounds>, and C<key> are also
 accepted. The C<bounds> parameter should be in the form:
 
    [{lat => ..., lng => ...}, {lat => ..., lng => ...}]
