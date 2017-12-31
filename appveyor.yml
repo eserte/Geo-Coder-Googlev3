@@ -3,15 +3,30 @@ branches:
     - /travis/
 skip_tags: true
 
-cache:
-  - C:\strawberry
+#cache:
+#  - C:\strawberry
+
+environment:
+  matrix:
+    - perl: activeperl
+      make: dmake
+    - perl: cygwinperl
+      make: make
+    - perl: strawberryperl
+      make: gmake
 
 install:
-  - if not exist "C:\strawberry" cinst --allow-empty-checksums strawberryperl
-  - set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+  - if %perl%==strawberryperl ( if not exist "C:\strawberry" cinst strawberryperl )
+  - if %perl%==strawberryperl   set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+  - if not %perl%==cygwinperl perl -v
+  - if     %perl%==cygwinperl c:\cygwin\bin\sh -c "/usr/bin/perl -v"
   - cd C:\projects\%APPVEYOR_PROJECT_NAME%
-  - cpanm --installdeps .
+  - if %perl%==activeperl       ppm install dmake JSON::XS LWP::UserAgent URI
+  - if %perl%==strawberryperl   cpanm --installdeps .
+  # Install the missing crypt.h for compiling XS modules
+  - if %perl%==cygwinperl       C:\cygwin\setup-x86.exe -q --packages=libcrypt-devel
+  - if %perl%==cygwinperl       c:\cygwin\bin\sh -c "PATH=/usr/bin:/bin; (cd /tmp && git clone https://github.com/eserte/travis-helper-cpan-pm.git && ./travis-helper-cpan-pm/travis-helper-cpan-pm --no-sudo && cpan JSON::XS LWP::UserAgent URI)"
 
 build_script:
-  - perl Makefile.PL
-  - gmake test
+  - if     %perl%==cygwinperl   c:\cygwin\bin\sh -c "PATH=/usr/bin:/bin; perl Makefile.PL && $make test"
+  - if not %perl%==cygwinperl ( perl Makefile.PL && %make% test )
