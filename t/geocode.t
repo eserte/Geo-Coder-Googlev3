@@ -105,7 +105,7 @@ SKIP: {
     my $geocoder_us = Geo::Coder::Googlev3->new();
     my $location_us = safe_geocode { $geocoder_us->geocode(location => 'Toledo') };
     within $location_us->{geometry}->{location}->{lat}, $location_us->{geometry}->{location}->{lng},
-	41.663938, 41.663939, -83.55522, -83.55521;
+	41.652805, 41.663939, -83.55522, -83.537867;
 }
 
 { # bounds
