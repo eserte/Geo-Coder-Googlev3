@@ -1,22 +1,37 @@
 language: perl
-dist: trusty
-perl:
-  - "5.26"
-  - "5.22"
-  - "5.20"
-  - "5.18"
-  - "5.16"
-  - "5.12"
-  - "5.10"
-  - "5.8"
+arch:
+ - arm64
 matrix:
-  include:
-    # The perl does not matter here, system perl will be used
-    - perl: "5.18"
-      os: osx
-      sudo: true
-    - perl: "5.14"
-      dist: precise
+ include:
+  - dist: xenial
+    perl: 5.24
+  - dist: focal
+    perl: 5.32
+ # Actually allow failures everywhere --- abandoned module
+ allow_failures:
+  - dist: xenial
+  - dist: bionic
+  - dist: focal
+
+#dist: trusty
+#perl:
+#  - "5.26"
+#  - "5.22"
+#  - "5.20"
+#  - "5.18"
+#  - "5.16"
+#  - "5.12"
+#  - "5.10"
+#  - "5.8"
+#matrix:
+#  include:
+#    # The perl does not matter here, system perl will be used
+#    - perl: "5.18"
+#      os: osx
+#      sudo: true
+#    - perl: "5.14"
+#      dist: precise
+#sudo: false
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; brew install cpanminus; fi
@@ -26,4 +41,5 @@ install:
 branches:
  except:
   - /appveyor/
-sudo: false
+  - /github-actions/
+  - /doozer/
